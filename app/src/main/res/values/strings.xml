@@ -11,4 +11,10 @@
     <string name="desc_toolbar_back_arrow">toolbar back arrow</string>
     <string name="desc_toolbar_center_title">toolbar center title</string>
     <string name="label_coming_soon">Coming Soon</string>
+    <string name="test">tesss</string>
+    <string name="list_screen_heading_msg">
+        <font color="#6A6A6A">1:1 guidance from</font> <font color="#2C8F77" ><u>live</u> </font><font color="#6A6A6A">specialist</font>
+</string>
+    <string name="desc_explore_task_human_image">explore task human image</string>
+
 </resources>
