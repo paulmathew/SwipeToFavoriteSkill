@@ -6,9 +6,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.swipetofavorite.BuildConfig
+import com.example.swipetofavorite.R
+import com.example.swipetofavorite.SwipeToFavApplication
 import com.example.swipetofavorite.model.Skill
 import com.example.swipetofavorite.model.SkillList
 import com.example.swipetofavorite.retrofit.SwipeToFavApi
+import com.example.swipetofavorite.utils.isNetworkConnected
 import com.google.gson.Gson
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -22,7 +25,7 @@ class MainViewModel@Inject constructor(
     val skillList: LiveData<SkillList> // public and read only.
         get() = _skillList
 
-    val skillListLoadError = MutableLiveData<Boolean>()
+    val skillListLoadError = MutableLiveData<String>()
     val loading = MutableLiveData<Boolean>()
 
     init {
@@ -32,6 +35,7 @@ class MainViewModel@Inject constructor(
 
     fun fetchSkillList(){
         loading.postValue(true)
+        if(isNetworkConnected)
         viewModelScope.launch {
             repository.getPhysicalFitnessTopicDetails(getHeaderMap())
                 .subscribeOn(Schedulers.io())
@@ -39,18 +43,22 @@ class MainViewModel@Inject constructor(
                 .subscribe(
                     { response ->
                         run {
-                            Log.e("API CALL response", response.toString())
                             loading.postValue(false)
                             _skillList.postValue(response)
                         }
                     },
                     { error ->
                         run {
-                            Log.e("API CALL error", error.localizedMessage.toString())
                             loading.postValue(false)
+                            skillListLoadError.postValue(error.message)
                         }
                     }
                 )
+        }
+        else{
+            loading.postValue(false)
+            skillListLoadError.postValue(SwipeToFavApplication.ctx?.getString(R.string.no_internet_connection))
+
         }
 
     }

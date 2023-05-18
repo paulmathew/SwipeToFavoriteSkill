@@ -16,5 +16,8 @@
         <font color="#6A6A6A">1:1 guidance from</font> <font color="#2C8F77" ><u>live</u> </font><font color="#6A6A6A">specialist</font>
 </string>
     <string name="desc_explore_task_human_image">explore task human image</string>
+    <string name="label_ok">Ok</string>
+    <string name="label_warning">Warning</string>
+    <string name="no_internet_connection">No Internet Connection</string>
 
 </resources>
