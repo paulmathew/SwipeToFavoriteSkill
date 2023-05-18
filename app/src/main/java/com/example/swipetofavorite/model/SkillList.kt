@@ -5,5 +5,7 @@ data class SkillList(
     val message: Any?=null,
     val skills: List<Skill>?=null,
     val success: Boolean?=null,
-    val topicHeader: TopicHeader?=null
+    val topicHeader: TopicHeader?=null,
+    val code: Int?=null,
+    val errors: List<Error>?=null
 )

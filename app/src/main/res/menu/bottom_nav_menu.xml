@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_discover"
+        android:icon="@drawable/ic_nav_discover"
+        android:title="@string/title_discover" />
+
+    <item
+        android:id="@+id/navigation_reconnect"
+        android:icon="@drawable/ic_nav_reconnect"
+        android:title="@string/title_reconnect" />
+
+    <item
+        android:id="@+id/navigation_bookings"
+        android:icon="@drawable/ic_nav_bookings"
+        android:title="@string/title_bookings" />
+    <item
+        android:id="@+id/navigation_message"
+        android:icon="@drawable/ic_nav_messages"
+        android:title="@string/title_messages" />
+    <item
+        android:id="@+id/navigation_blogs"
+        android:icon="@drawable/ic_nav_blogs"
+        android:title="@string/title_blogs" />
+
+</menu>

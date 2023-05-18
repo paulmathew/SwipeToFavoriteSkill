@@ -7,4 +7,8 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="navigation_unselected">#B5B5B5</color>
+    <color name="navigation_selected">#565656</color>
+    <color name="toolbar_bg">#FFFFFF</color>
+    <color name="label_settings">#B5B5B5</color>
 </resources>
