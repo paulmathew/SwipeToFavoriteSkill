@@ -20,6 +20,7 @@ android {
         vectorDrawables {
             useSupportLibrary true
         }
+        buildConfigField "String","Base_Url","\"https://api-devenv.taskhuman.com/\""
         buildConfigField "String", "Authorization", "\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQ3MTYsInVzZXJzIjp7InN0YXR1cyI6MCwidHlwZSI6MCwiaXNNb2JpbGVWZXJpZmllZCI6dHJ1ZX0sImlhdCI6MTY3OTU3MzU4N30.gaiGbeN9tWIojmvSj0imKtCWW0wMhLzN-UjmXevzuyk\""
 
     }
@@ -104,6 +105,13 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview-selection:1.1.0'
 
 
-    //swipe
+    //Animation
+    implementation 'at.wirecube:additive_animations:1.9.3'
+
+
+
+
+
+
 
 }

@@ -1,18 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<com.google.android.material.imageview.ShapeableImageView android:id="@+id/profileImg"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    android:layout_width="@dimen/_45dp"
+    android:layout_height="@dimen/_45dp"
+    app:strokeWidth="@dimen/_3dp"
+    app:strokeColor="@color/white"
+    android:background="@color/black"
+    app:shapeAppearanceOverlay="@style/circleImageView"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
 
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/profileImg"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_width="@dimen/_32dp"
-        android:layout_height="@dimen/_32dp"
-        app:strokeWidth="@dimen/_1dp"
-        app:strokeColor="@color/white"
-        app:shapeAppearanceOverlay="@style/circleImageView" />
+    />
 
-
-</androidx.constraintlayout.widget.ConstraintLayout>

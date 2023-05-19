@@ -18,6 +18,7 @@
     android:layout_height="match_parent"
     android:background="@color/list_bg_color">
 
+
     <TextView
         android:id="@+id/text_notification"
         android:layout_width="match_parent"
@@ -80,7 +81,7 @@
                 android:layout_marginRight="@dimen/_8dp"
                 android:layout_marginBottom="@dimen/_8dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-android:nestedScrollingEnabled="true"
+
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"

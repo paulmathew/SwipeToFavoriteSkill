@@ -1,5 +1,6 @@
 package com.example.swipetofavorite.model
 
+import com.example.swipetofavorite.utils.FavoriteFlag
 import com.example.swipetofavorite.utils.getDateTime
 
 data class Skill(
@@ -8,14 +9,16 @@ data class Skill(
     val columns: Int?=null,
     val dictionaryName: String?=null,
     val displayTileName: String?=null,
-    val isFavorite: Boolean?=null,
+    var isFavorite: Boolean?=null,
     val moreProvidersAvailable: Boolean?=null,
     val providerInfo: MutableList<ProviderInfo>,
     val skillIcon: String?=null,
     val tileBackground: String?=null,
     val tileColor: String?=null,
     val tileName: String?=null,
-    val type: String?=null
+    val type: String?=null,
+    var isSwiped:Boolean=false,
+    var currentStateFlag:FavoriteFlag?=null
 )
 {
     var visibleName:String
@@ -29,8 +32,8 @@ data class Skill(
 
     var timeRange:String
         get() {
-            return if(availability?.startTime!=null && availability.endTime !=null)
-                "${getDateTime(availability?.startTime.toString())} - ${getDateTime(availability?.endTime.toString())}"
+            return if((availability?.startTime != null) && (availability.endTime != null))
+                "${getDateTime(availability.startTime.toString())} - ${getDateTime(availability.endTime.toString())}"
             else
                 ""
 

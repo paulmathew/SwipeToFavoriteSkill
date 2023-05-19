@@ -1,7 +1,7 @@
 package com.example.swipetofavorite.di
 
+import com.example.swipetofavorite.BuildConfig
 import com.example.swipetofavorite.retrofit.SwipeToFavApi
-import com.example.swipetofavorite.utils.Constants
 import dagger.Module
 import dagger.Provides
 import okhttp3.OkHttpClient
@@ -24,7 +24,7 @@ class NetworkModule {
 
 
 
-        return Retrofit.Builder().baseUrl(Constants.BASE_URL)
+        return Retrofit.Builder().baseUrl(BuildConfig.Base_Url)
             .addConverterFactory(GsonConverterFactory.create())
             .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
             .client(okHttpBuilder.build())

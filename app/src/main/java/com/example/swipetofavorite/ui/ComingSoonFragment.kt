@@ -11,8 +11,6 @@ class ComingSoonFragment : Fragment() {
 
     private var _binding: ActivityComingSoonBinding? = null
 
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
 
     override fun onCreateView(
@@ -22,10 +20,9 @@ class ComingSoonFragment : Fragment() {
     ): View {
 
         _binding = ActivityComingSoonBinding.inflate(inflater, container, false)
-        val root: View = binding.root
 
 
-        return root
+        return binding.root
     }
 
     override fun onDestroyView() {

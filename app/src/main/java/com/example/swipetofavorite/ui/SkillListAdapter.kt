@@ -2,31 +2,34 @@ package com.example.swipetofavorite.ui
 
 import android.annotation.SuppressLint
 import android.graphics.Color
-import android.graphics.Rect
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
-import androidx.core.view.get
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 import com.example.swipetofavorite.R
 import com.example.swipetofavorite.databinding.ItemSkillListBinding
 import com.example.swipetofavorite.model.Skill
 import com.example.swipetofavorite.utils.OnSwipeTouchListener
+import com.example.swipetofavorite.utils.FavoriteFlag
 import com.example.swipetofavorite.utils.getProgressDrawable
+import com.example.swipetofavorite.utils.hideMenu
+import com.example.swipetofavorite.utils.loadImage
+import com.example.swipetofavorite.utils.setMargins
+import com.example.swipetofavorite.utils.showMenu
+import com.google.android.material.imageview.ShapeableImageView
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
-
+@SuppressLint("NotifyDataSetChanged")
 class SkillListAdapter(
     private var skillList: MutableList<Skill>,
     private val onClickListener: OnClickListener
 ) :
     RecyclerView.Adapter<SkillListAdapter.SkillViewHolder>() {
 
-
-    @SuppressLint("NotifyDataSetChanged")
+    var previousSwipePos = 0
     fun updateSkills(newSkills: MutableList<Skill>) {
         skillList.clear()
         skillList.addAll(newSkills)
@@ -43,36 +46,98 @@ class SkillListAdapter(
 
     override fun onBindViewHolder(holder: SkillViewHolder, position: Int) {
         holder.bind(skillList[position])
-        holder.itemView.setOnClickListener { onClickListener.onClick(skillList[position]) }
+
+
+        // for row item swipe
+        holder.itemView.setOnTouchListener(object :
+            OnSwipeTouchListener(holder.itemView.context) {
+
+            override fun onSwipeRight() {
+                skillList[previousSwipePos].isSwiped = false
+                notifyDataSetChanged()
+            }
+
+            override fun onSwipeLeft() {
+
+                if (skillList[previousSwipePos].isSwiped) {
+                    skillList[previousSwipePos].isSwiped = false
+                }
+                previousSwipePos = holder.layoutPosition
+                skillList[previousSwipePos].isSwiped = true
+                notifyDataSetChanged()
+
+            }
+
+        })
+
+        // for row item click or skill item click
+        holder.bindingItem.parentView.setOnClickListener {}
+        // for menu item click
+        holder.bindingItem.menuView.setOnClickListener {
+            onClickListener.onClick(
+                skillList[holder.layoutPosition],
+                holder.layoutPosition,
+                isMenu = true
+            )
+        }
+
     }
+
+    override fun getItemViewType(position: Int): Int {
+        return 1
+    }
+    suspend fun changeMenuItemData(pos: Int, flag: FavoriteFlag) {
+        coroutineScope {
+
+            launch {
+                skillList[pos].currentStateFlag = flag
+                skillList[pos].isSwiped = true
+                notifyItemChanged(pos)
+                delay(3000)
+                when (flag) {
+                    FavoriteFlag.Added -> {
+                        skillList[pos].currentStateFlag = FavoriteFlag.Remove
+                        skillList[pos].isFavorite = true
+                    }
+
+                    FavoriteFlag.Removed -> {
+                        skillList[pos].currentStateFlag = FavoriteFlag.AddTo
+                        skillList[pos].isFavorite = false
+                    }
+
+                    else -> {}
+                }
+
+                skillList[pos].isSwiped = false
+                notifyItemChanged(pos)
+            }
+        }
+
+    }
+
 
     class SkillViewHolder(private val binding: ItemSkillListBinding) :
         RecyclerView.ViewHolder(binding.root) {
+        lateinit var bindingItem: ItemSkillListBinding
+        private val progressDrawable = getProgressDrawable(binding.root.context)
 
-        var isMenuVisible = false
+
 
         @SuppressLint("ClickableViewAccessibility")
         fun bind(skill: Skill) {
-            binding.menuView.translationX=binding.menuView.width.toFloat()
-
-            if (!isMenuVisible) {
-                hideMenu()
-            }
-            binding.parentView.setOnTouchListener(object :
-                OnSwipeTouchListener(binding.root.context) {
-
-                override fun onSwipeRight() {
-                    hideMenu()
-                    Log.e("Swipe ", "Right")
-                }
-
-                override fun onSwipeLeft() {
-                    Log.e("Swipe ", "Left")
-
-                    showMenu()
-                }
-            })
             binding.item = skill
+            bindingItem = binding
+
+            if (skill.isSwiped) {
+                showMenu(binding)
+
+            } else {
+
+                hideMenu(binding)
+            }
+
+
+
             when (skill.availability?.status) {
                 0 -> {
                     binding.availabilityButton.background = ContextCompat.getDrawable(
@@ -100,100 +165,113 @@ class SkillListAdapter(
                 }
             }
 
-            if (!skill.tileColor.isNullOrEmpty()) {
-                binding.parentCard.setCardBackgroundColor(Color.parseColor(skill.tileColor))
-            }
+
             if (!skill.providerInfo.isNullOrEmpty()) {
-                binding.imagesRecyclerView.adapter = ImageListAdapter(skill.providerInfo)
-                binding.imagesRecyclerView.layoutManager = LinearLayoutManager(
-                    binding.root.context,
-                    LinearLayoutManager.HORIZONTAL,
-                    false
-                )
-                binding.imagesRecyclerView.setHasFixedSize(true)
-                binding.imagesRecyclerView.addItemDecoration(ItemDecorator())
+                binding.listOfImages.removeAllViews()
+                for (i in skill.providerInfo.indices) {
+                    val item = skill.providerInfo[i]
+                    val itemView = LayoutInflater.from(binding.root.context)
+                        .inflate(R.layout.item_circle_image, binding.listOfImages, false)
+                    val imageView = itemView.findViewById<ShapeableImageView>(R.id.profileImg)
+                    imageView.loadImage(item.profileImage, progressDrawable)
+
+                    val overlapAmount = 10
+                    if (i != 0) {
+                        imageView.translationX = overlapAmount.toFloat()
+                        setMargins(imageView, -50, 0, 0, 0)
+                    }
+                    if (i < 4)
+                        binding.listOfImages.addView(imageView)
+
+                }
             }
-            binding.imagesRecyclerView.suppressLayout(true)
-         if(!skill.availability?.color.isNullOrEmpty())
-            binding.timestampView.setTextColor(Color.parseColor(skill.availability?.color))
 
+
+
+            if (!skill.availability?.color.isNullOrEmpty())
+                binding.timestampView.setTextColor(Color.parseColor(skill.availability?.color))
+
+            when (skill.isFavorite) {
+                true -> {
+                    changeMenuIcon(FavoriteFlag.Remove)
+                }
+
+                false -> {
+                    changeMenuIcon(FavoriteFlag.AddTo)
+                }
+
+                else -> {}
+            }
+
+            when (skill.currentStateFlag) {
+                FavoriteFlag.Added -> {
+                    changeMenuIcon(FavoriteFlag.Added)
+                    skill.currentStateFlag = FavoriteFlag.Remove
+                }
+
+                FavoriteFlag.Removed -> {
+                    changeMenuIcon(FavoriteFlag.Removed)
+                    skill.currentStateFlag = FavoriteFlag.AddTo
+                }
+
+                else -> {}
+            }
         }
 
-        fun showMenu() {
 
-            binding.menuView.animate()
-                .translationX(0F)
-                .alpha(1F)
-                .setDuration(250)
-                .withEndAction {   binding.menuView.visibility = View.VISIBLE }
-                .start()
+        private fun changeMenuIcon(typeFlag: FavoriteFlag) {
+            when (typeFlag) {
+                FavoriteFlag.AddTo -> {
+                    binding.menuOption.text =
+                        binding.root.context.getString(R.string.label_add_to_favorite)
+                    binding.menuOption.setCompoundDrawablesWithIntrinsicBounds(
+                        0,
+                        R.drawable.ic_heart_swipe_to,
+                        0,
+                        0
+                    )
 
+                }
 
+                FavoriteFlag.Added -> {
+                    binding.menuOption.text =
+                        binding.root.context.getString(R.string.label_added_to_fav)
+                    binding.menuOption.setCompoundDrawablesWithIntrinsicBounds(
+                        0,
+                        R.drawable.ic_added_to_fav,
+                        0,
+                        0
+                    )
+                }
 
+                FavoriteFlag.Remove -> {
+                    binding.menuOption.text =
+                        binding.root.context.getString(R.string.label_remove_favorite)
+                    binding.menuOption.setCompoundDrawablesWithIntrinsicBounds(
+                        0,
+                        R.drawable.ic_remove_from,
+                        0,
+                        0
+                    )
+                }
 
-            binding.parentCard.animate()
-                .translationX((-binding.menuView.width).toFloat())
-                .setDuration(500)
-                .start()
-
-            binding.availabilityButton.animate()
-                .translationX((-binding.menuView.width).toFloat())
-                .setDuration(500)
-                .start()
-
-            isMenuVisible = true
-        }
-
-         fun hideMenu() {
-            //  binding.menuView.visibility = View.GONE
-         binding.menuView.animate()
-             .translationX(binding.menuView.width.toFloat())
-             .setDuration(300)
-             .withEndAction { binding.menuView.visibility=View.INVISIBLE }
-             .start()
-
-
-            binding.parentCard.animate()
-                .translationX(0F)
-                .setDuration(300)
-                .start()
-            binding.availabilityButton.animate()
-                .translationX(0F)
-                .setDuration(300)
-                .start()
-            isMenuVisible = false
-        }
-
-        fun closeSwipeMenu() {
-            if (isMenuVisible) {
-                hideMenu()
+                FavoriteFlag.Removed -> {
+                    binding.menuOption.text =
+                        binding.root.context.getString(R.string.label_removed)
+                    binding.menuOption.setCompoundDrawablesWithIntrinsicBounds(
+                        0,
+                        R.drawable.ic_remove_from,
+                        0,
+                        0
+                    )
+                }
             }
         }
     }
+}
 
-
+class OnClickListener(val clickListener: (skill: Skill, pos: Int, isMenu: Boolean) -> Unit) {
+    fun onClick(skill: Skill, pos: Int, isMenu: Boolean) = clickListener(skill, pos, isMenu)
 }
 
 
-class ItemDecorator() : ItemDecoration() {
-
-    override fun getItemOffsets(
-        outRect: Rect,
-        view: View,
-        parent: RecyclerView,
-        state: RecyclerView.State
-    ) {
-        val position = parent.getChildAdapterPosition(view)
-        if (position != 0) {
-            val widthOverlapPercentage = 0.50
-            val previousView = parent[position - 1]
-            val overlapWidth = previousView.width * widthOverlapPercentage
-            outRect.left = overlapWidth.toInt() * -1
-        }
-    }
-}
-
-
-class OnClickListener(val clickListener: (skill: Skill) -> Unit) {
-    fun onClick(skill: Skill) = clickListener(skill)
-}

@@ -1,15 +1,21 @@
 package com.example.swipetofavorite.utils
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
+import android.view.View
+import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.widget.ImageView
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
+import at.wirecube.additiveanimations.additive_animator.AdditiveAnimator
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.example.swipetofavorite.R
 import com.example.swipetofavorite.SwipeToFavApplication
+import com.example.swipetofavorite.databinding.ItemSkillListBinding
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -31,6 +37,7 @@ fun ImageView.loadImage(uri: String?, progressDrawable: CircularProgressDrawable
         .into(this)
 }
 
+@SuppressLint("SimpleDateFormat")
 fun getDateTime(timeStamp: String): String {
     return SimpleDateFormat("hh:mm a").format(Date(timeStamp.toLong())).toString()
 
@@ -63,3 +70,55 @@ val isNetworkConnected: Boolean
 
         return result
     }
+
+enum class FavoriteFlag{
+    AddTo,
+    Added,
+    Remove,
+    Removed
+}
+
+//for getting the actual width of a view after loading fully
+fun View.afterLayout(what: () -> Unit) {
+    if(isLaidOut) {
+        what.invoke()
+    } else {
+        viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                viewTreeObserver.removeOnGlobalLayoutListener(this)
+                what.invoke()
+            }
+        })
+    }
+}
+
+fun showMenu(binding: ItemSkillListBinding) {
+    binding.menuView.afterLayout {
+        AdditiveAnimator().target(binding.menuView).setDuration(300).fadeVisibility(View.VISIBLE)
+            .target(binding.parentCard).translationX(-binding.menuView.width.toFloat())
+            .target(binding.availabilityButton).translationX(-binding.menuView.width.toFloat())
+            .target(binding.menuView).translationX(0f).start()
+    }
+}
+
+fun hideMenu(binding: ItemSkillListBinding) {
+    binding.menuView.afterLayout {
+        AdditiveAnimator().setDuration(300).target(binding.menuView)
+            .translationX(binding.menuView.width.toFloat())
+            .target(binding.parentCard).translationX(0f)
+            .target(binding.availabilityButton).translationX(0f)
+            .target(binding.menuView).fadeVisibility(View.INVISIBLE).start()
+    }
+
+
+}
+
+// this function is to set the margin data to the stacked images in a skill list item
+fun setMargins(view: View, left: Int, top: Int, right: Int, bottom: Int) {
+    if (view.layoutParams is ViewGroup.MarginLayoutParams) {
+        val p = view.layoutParams as ViewGroup.MarginLayoutParams
+        p.setMargins(left, top, right, bottom)
+        view.requestLayout()
+    }
+}
+

@@ -6,7 +6,9 @@ data class ProviderInfo(
     val groupIcon: String?=null,
     val imageUrl: String?=null,
     val lastName: String?=null,
+    val userId: Int?=null,
+    val endTime: Long?=null,
     val profileImage: String?=null,
     val providerId: Int?=null,
-    val userId: Int?=null
+    val startTime: Long?=null
 )

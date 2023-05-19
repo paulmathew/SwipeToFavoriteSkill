@@ -6,13 +6,11 @@ import androidx.fragment.app.Fragment
 import com.example.swipetofavorite.databinding.ActivityMainBinding
 import com.example.swipetofavorite.ui.ComingSoonFragment
 import com.example.swipetofavorite.ui.SkillsListFragment
-import com.example.swipetofavorite.viewmodel.MainViewModel
 import com.example.swipetofavorite.viewmodel.MainViewModelFactory
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var mainViewModel: MainViewModel
     private lateinit var binding: ActivityMainBinding
 
     @Inject
